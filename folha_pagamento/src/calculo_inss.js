@@ -20,7 +20,7 @@
     valorpago = salarioBruto * aliquota;
   }
 
-  return valorpago;
+  return valorpago.toFixed(2);
 };
 
 module.exports = calcularINSS;
