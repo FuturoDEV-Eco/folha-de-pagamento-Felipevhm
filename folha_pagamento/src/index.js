@@ -18,7 +18,9 @@ rl.question("Qual é o nome do funcionário? ", (nome) => {
         rl.question(
           "O funcionário tem descontos? (true/false) ",
           (respostaDescontos) => {
+            rl.question("Gostaria de gerar um PDF com estas informações? (true/false)",(respostaPdf)=>{
             const temDescontos = respostaDescontos.toLowerCase() === "true";
+            const querPdf = respostaPdf.toLowerCase() === "true";
             const outINSS = calcularINSS(salarioBase);
             const outIR = calcularIR(salarioBase);
 
@@ -43,34 +45,40 @@ rl.question("Qual é o nome do funcionário? ", (nome) => {
             temDescontos
           )}
         `);
-            fs.mkdirSync("./folhas_pagamento", { recursive: true });
+            if(querPdf){
+              fs.mkdirSync("./folhas_pagamento", { recursive: true });
 
-            const doc = new PDFDocument();
-            doc.pipe(fs.createWriteStream(`./folhas_pagamento/${nome}.pdf`));
-
-            doc.text(`Nome: ${nome}`);
-            doc.text(`Data: ${dataFormatada}`);
-            doc.text(`CPF: ${cpf}`);
-            doc.text(`Mês do Pagamento: ${dataAtual.getMonth() + 1}`);
-            doc.text(`Salario Bruto: ${salarioBase}`);
-            doc.text(`INSS: ${outINSS}`);
-            doc.text(`IR: ${outIR}`);
-            doc.text(`Tem Descontos? ${temDescontos ? "Sim." : "Não."}`);
-            doc.text(`-------`);
-            doc.text(
-              `Salario Líquido : ${calculaSalarioLiquido(
-                salarioBase,
-                outINSS,
-                outIR,
-                temDescontos
-              )}`
-            );
-
-            doc.end();
-
+              const doc = new PDFDocument();
+              doc.pipe(fs.createWriteStream(`./folhas_pagamento/${nome}.pdf`));
+  
+              doc.text(`Nome: ${nome}`);
+              doc.text(`Data: ${dataFormatada}`);
+              doc.text(`CPF: ${cpf}`);
+              doc.text(`Mês do Pagamento: ${dataAtual.getMonth() + 1}`);
+              doc.text(`Salario Bruto: ${salarioBase}`);
+              doc.text(`INSS: ${outINSS}`);
+              doc.text(`IR: ${outIR}`);
+              doc.text(`Tem Descontos? ${temDescontos ? "Sim." : "Não."}`);
+              doc.text(`-------`);
+              doc.text(
+                `Salario Líquido : ${calculaSalarioLiquido(
+                  salarioBase,
+                  outINSS,
+                  outIR,
+                  temDescontos
+                )}`
+              );
+              console.log("--- PDF gerado com sucesso! ---")
+              doc.end();
+            }
+            else{
+              console.log("--- PDF não gerado ---")
+            }
+         
             rl.close();
           }
         );
+      })
       });
   });
 });
